@@ -1,6 +1,6 @@
-export const QUEUE_NAME = "ai-tenerary-queue";
+export const QUEUE_NAME = "ai-recipe-queue";
 
 export const workerConnection = {
-	host: "localhost",
-	port: "6380",
+    host: "localhost",
+    port: "6380",
 };
