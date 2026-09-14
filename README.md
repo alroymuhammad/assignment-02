@@ -64,6 +64,8 @@ pnpm run worker:dev
 
 Both the API and worker must be running for queued jobs to be processed.
 
+> **Why `--harmony-temporal`?** Temporal is not enabled by default in the current Node.js runtime, but Prisma 8's data shape requires it. The development scripts therefore start Node.js with this flag.
+
 ## API examples
 
 ### List jobs
