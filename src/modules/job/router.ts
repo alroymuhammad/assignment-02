@@ -6,28 +6,28 @@ import { queue } from "../../worker/queue";
 
 export const jobRouter = new Hono()
     .get("/", async (c) => {
-        const jobs = await db.orm.public.Job.all();
-        return c.json({ jobs: jobs });
+        const recipeJobs = await db.orm.public.RecipeJob.all();
+        return c.json({ recipeJobs });
     })
     .get("/:id", async (c) => {
         const { id } = c.req.param();
 
-        const destinationList = await db.orm.public.JobResult.where((jr) =>
-            jr.jobId.eq(id),
+        const recipeList = await db.orm.public.RecipeResult.where((recipe) =>
+            recipe.recipeJobId.eq(id),
         ).all();
 
-        return c.json({ jobId: id, destinationList });
+        return c.json({ recipeJobId: id, recipeList });
     })
     .post("/", zValidator("json", CreateJobSchema), async (c) => {
         const body = c.req.valid("json");
 
-        const newJob = await db.orm.public.Job.create({
-            destination: body.destination,
-            budget: body.budget,
+        const recipeJob = await db.orm.public.RecipeJob.create({
+            ingredients: body.ingredients,
+            goal: body.goal,
             status: "PENDING",
         });
 
-        await queue.add("generate-destination", newJob);
+        await queue.add("generate-recipe", recipeJob);
 
-        return c.json({ job: newJob }, 202);
+        return c.json({ recipeJob }, 202);
     });

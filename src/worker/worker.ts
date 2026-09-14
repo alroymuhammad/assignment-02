@@ -1,7 +1,7 @@
 import { Worker } from "bullmq";
 import { QUEUE_NAME, workerConnection } from "./config";
 import { db } from "../utils/db";
-import { generateDestinationList } from "../modules/job/service";
+import { generateRecipeList } from "../modules/job/service";
 
 export const worker = new Worker(
 	QUEUE_NAME,
@@ -13,34 +13,27 @@ export const worker = new Worker(
 			throw new Error("Job ID is missing");
 		}
 
-		const jobData = await db.orm.public.Job.where((job) =>
+		const recipeJob = await db.orm.public.RecipeJob.where((job) =>
 			job.id.eq(jobId),
 		).first();
-		console.log(jobData);
+		console.log(recipeJob);
 
-		if (!jobData?.destination || !jobData?.budget) {
-			throw new Error(`Job with ID ${jobId} not found`);
+		if (!recipeJob) {
+			throw new Error(`Recipe job with ID ${jobId} not found`);
 		}
 
-		const destinationList = await generateDestinationList(
-			jobData?.destination,
-			jobData?.budget,
+		const { recipeList } = await generateRecipeList(
+			recipeJob.ingredients,
+			recipeJob.goal,
 		);
 
-		console.log("Destination has been generated successfully");
-		console.log(destinationList);
+		console.log("Recipes generated successfully");
+		console.log(recipeList);
 
-		const destinationListWithId = destinationList.destinations.map((d) => {
-			return {
-				jobId: jobData.id,
-				name: d.name,
-				description: d.description,
-				location: d.location,
-			};
-		});
-
-		await db.orm.public.JobResult.createAll(destinationListWithId);
-		await db.orm.public.Job.where((job) => job.id.eq(jobId)).update({
+		await db.orm.public.RecipeResult.createAll(
+			recipeList.map((recipe) => ({ ...recipe, recipeJobId: recipeJob.id })),
+		);
+		await db.orm.public.RecipeJob.where((job) => job.id.eq(jobId)).update({
 			status: "COMPLETED",
 		});
 	},

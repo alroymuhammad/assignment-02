@@ -1,15 +1,17 @@
-model Job {
+model RecipeJob {
     id          String   @id @default(uuid())
-    destination String
-    budget      String
+    ingredients String[]
+    goal        String
     status      String
     createdAt   DateTime @default(now())
 }
 
-model JobResult {
-    id          String @id @default(uuid())
-    name        String
-    description String
-    location    String
-    jobId       String
+model RecipeResult {
+    id                          String   @id @default(uuid())
+    name                        String
+    description                 String
+    ingredients                 String[]
+    instructions                String[]
+    estimatedCaloriesPerServing Int
+    recipeJobId                 String
 }

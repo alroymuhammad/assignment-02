@@ -2,36 +2,38 @@ import z from "zod";
 import { generateCompletion } from "@anvia/core";
 import { getModel } from "../../llm/models";
 
-const DestinationSchema = z.object({
-	name: z.string(),
-	description: z.string(),
-	location: z.string(),
+const RecipeSchema = z.object({
+    name: z.string(),
+    description: z.string(),
+    ingredients: z.array(z.string()),
+    instructions: z.array(z.string()),
+    estimatedCaloriesPerServing: z.number().int(),
 });
 
-const DestinationListSchema = z.object({
-	destinations: z.array(DestinationSchema),
+const RecipeListSchema = z.object({
+    recipeList: z.array(RecipeSchema).max(3),
 });
 
 const SYSTEM_INSTRUCTIONS =
-	"You are a travel expert. Generate a list of 2 unique travel destinations with their name, description, and location in JSON format";
+    "You are an Indonesian cooking expert. Generate up to 3 recipes as JSON.";
 
-export async function generateDestinationList(
-	destination: string,
-	budget: string,
+export async function generateRecipeList(
+    ingredients: readonly string[],
+    goal: string,
 ) {
-	console.log(`Generating destination list for: ${destination}`);
+    console.log(`Generating recipes for: ${ingredients.join(", ")}`);
 
-	const PROMPT = `Generate a list of 2 unique travel destinations with their name, description, and location in JSON format.
-    The destinations should be related to ${destination} and within a budget of ${budget}.`;
+    const prompt = `Generate Indonesian recipes using these ingredients: ${ingredients.join(", ")}.
+The recipes should satisfy this goal: ${goal}.`;
 
-	const res = await generateCompletion({
-		model: getModel(),
-		prompt: PROMPT,
-		instructions: SYSTEM_INSTRUCTIONS,
-		outputSchema: DestinationListSchema,
-	});
+    const res = await generateCompletion({
+        model: getModel(),
+        prompt,
+        instructions: SYSTEM_INSTRUCTIONS,
+        outputSchema: RecipeListSchema,
+    });
 
-	console.log("Generating Done!");
+    console.log("Generating done!");
 
-	return res.output;
+    return res.output;
 }

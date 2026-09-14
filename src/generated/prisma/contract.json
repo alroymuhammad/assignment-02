@@ -4,12 +4,12 @@
   "target": "postgres",
   "profileHash": "3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2",
   "roots": {
-    "job": {
-      "model": "Job",
+    "recipeJob": {
+      "model": "RecipeJob",
       "namespace": "public"
     },
-    "jobResult": {
-      "model": "JobResult",
+    "recipeResult": {
+      "model": "RecipeResult",
       "namespace": "public"
     }
   },
@@ -17,15 +17,8 @@
     "namespaces": {
       "public": {
         "models": {
-          "Job": {
+          "RecipeJob": {
             "fields": {
-              "budget": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/text@1",
-                  "kind": "scalar"
-                }
-              },
               "createdAt": {
                 "nullable": false,
                 "type": {
@@ -33,7 +26,7 @@
                   "kind": "scalar"
                 }
               },
-              "destination": {
+              "goal": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
@@ -41,6 +34,14 @@
                 }
               },
               "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "ingredients": {
+                "many": true,
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
@@ -58,32 +59,39 @@
             "relations": {},
             "storage": {
               "fields": {
-                "budget": {
-                  "column": "budget"
-                },
                 "createdAt": {
                   "column": "createdAt"
                 },
-                "destination": {
-                  "column": "destination"
+                "goal": {
+                  "column": "goal"
                 },
                 "id": {
                   "column": "id"
+                },
+                "ingredients": {
+                  "column": "ingredients"
                 },
                 "status": {
                   "column": "status"
                 }
               },
               "namespaceId": "public",
-              "table": "job"
+              "table": "recipeJob"
             }
           },
-          "JobResult": {
+          "RecipeResult": {
             "fields": {
               "description": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "estimatedCaloriesPerServing": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
                   "kind": "scalar"
                 }
               },
@@ -94,14 +102,16 @@
                   "kind": "scalar"
                 }
               },
-              "jobId": {
+              "ingredients": {
+                "many": true,
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               },
-              "location": {
+              "instructions": {
+                "many": true,
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
@@ -109,6 +119,13 @@
                 }
               },
               "name": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "recipeJobId": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
@@ -122,21 +139,27 @@
                 "description": {
                   "column": "description"
                 },
+                "estimatedCaloriesPerServing": {
+                  "column": "estimatedCaloriesPerServing"
+                },
                 "id": {
                   "column": "id"
                 },
-                "jobId": {
-                  "column": "jobId"
+                "ingredients": {
+                  "column": "ingredients"
                 },
-                "location": {
-                  "column": "location"
+                "instructions": {
+                  "column": "instructions"
                 },
                 "name": {
                   "column": "name"
+                },
+                "recipeJobId": {
+                  "column": "recipeJobId"
                 }
               },
               "namespaceId": "public",
-              "table": "jobResult"
+              "table": "recipeResult"
             }
           }
         }
@@ -148,13 +171,15 @@
       "public": {
         "entries": {
           "table": {
-            "job": {
+            "recipeJob": {
+              "checks": [
+                {
+                  "expression": "array_position(\"ingredients\", NULL) IS NULL",
+                  "name": "recipeJob_ingredients_elem_not_null_225187b9",
+                  "prefix": "recipeJob_ingredients_elem_not_null"
+                }
+              ],
               "columns": {
-                "budget": {
-                  "codecId": "pg/text@1",
-                  "nativeType": "text",
-                  "nullable": false
-                },
                 "createdAt": {
                   "codecId": "pg/timestamptz-temporal@1",
                   "default": {
@@ -164,13 +189,19 @@
                   "nativeType": "timestamptz",
                   "nullable": false
                 },
-                "destination": {
+                "goal": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": false
                 },
                 "id": {
                   "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "ingredients": {
+                  "codecId": "pg/text@1",
+                  "many": true,
                   "nativeType": "text",
                   "nullable": false
                 },
@@ -189,11 +220,28 @@
               },
               "uniques": []
             },
-            "jobResult": {
+            "recipeResult": {
+              "checks": [
+                {
+                  "expression": "array_position(\"ingredients\", NULL) IS NULL",
+                  "name": "recipeResult_ingredients_elem_not_null_225187b9",
+                  "prefix": "recipeResult_ingredients_elem_not_null"
+                },
+                {
+                  "expression": "array_position(\"instructions\", NULL) IS NULL",
+                  "name": "recipeResult_instructions_elem_not_null_fd3a69a7",
+                  "prefix": "recipeResult_instructions_elem_not_null"
+                }
+              ],
               "columns": {
                 "description": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
+                  "nullable": false
+                },
+                "estimatedCaloriesPerServing": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
                   "nullable": false
                 },
                 "id": {
@@ -201,17 +249,24 @@
                   "nativeType": "text",
                   "nullable": false
                 },
-                "jobId": {
+                "ingredients": {
                   "codecId": "pg/text@1",
+                  "many": true,
                   "nativeType": "text",
                   "nullable": false
                 },
-                "location": {
+                "instructions": {
                   "codecId": "pg/text@1",
+                  "many": true,
                   "nativeType": "text",
                   "nullable": false
                 },
                 "name": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "recipeJobId": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": false
@@ -232,10 +287,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "9e3593719b92e7d519888c9a4bb5c7ee8ecf5ff82b282b74cc71ad6ab6a0596a"
+    "storageHash": "409bc0dec4980f6daa6e6776b66d05ddfa23bda4cffabb079adf973f13b48c41"
   },
   "execution": {
-    "executionHash": "2d377016ed7b4667e9b7df178af156b6af4e1032592d89d4c1030b0cce080e59",
+    "executionHash": "720d7c11e350d40f69ac3b5a8f9593ab8300290ba690d2c45c7b2fbb8b22503c",
     "mutations": {
       "defaults": [
         {
@@ -246,7 +301,7 @@
           "ref": {
             "column": "id",
             "namespace": "public",
-            "table": "job"
+            "table": "recipeJob"
           }
         },
         {
@@ -257,7 +312,7 @@
           "ref": {
             "column": "id",
             "namespace": "public",
-            "table": "jobResult"
+            "table": "recipeResult"
           }
         }
       ]
