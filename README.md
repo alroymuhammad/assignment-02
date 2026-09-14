@@ -1,6 +1,6 @@
-# Assignment 02
+# Indonesian Recipe Generator
 
-An assignment focused on database integration with Prisma and Hono, plus background job processing with BullMQ and Redis.
+An AI-powered API that generates up to three Indonesian recipes from a list of ingredients and a cooking goal. Requests are queued with BullMQ, processed in the background using an OpenAI-compatible model, and stored in PostgreSQL with Prisma.
 
 ## Tech stack
 
@@ -68,13 +68,32 @@ Both the API and worker must be running for queued jobs to be processed.
 
 ## API examples
 
-### List jobs
+### Generate recipes
 
 ```bash
-curl http://localhost:3000/jobs
+curl -X POST http://localhost:3000/recipes \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ingredients": ["chicken", "rice", "chili"],
+    "goal": "A quick, high-protein dinner"
+  }'
 ```
 
-A job starts with the `PENDING` status and changes to `COMPLETED` after the worker finishes.
+The request returns a recipe job with a `PENDING` status. The worker generates and stores up to three recipes, then marks the job as `COMPLETED`.
+
+### List recipe jobs
+
+```bash
+curl http://localhost:3000/recipes
+```
+
+### Get generated recipes
+
+Replace `<job-id>` with the ID returned when creating the job:
+
+```bash
+curl http://localhost:3000/recipes/<job-id>
+```
 
 ## Available scripts
 
@@ -90,7 +109,7 @@ A job starts with the `PENDING` status and changes to `COMPLETED` after the work
 src/
 ├── index.ts              # Hono server
 ├── llm/                  # AI model configuration
-├── modules/job/          # Job routes, validation, and generation service
+├── modules/job/          # Recipe job routes, validation, and AI generation
 ├── utils/db.ts           # Database client
 └── worker/               # BullMQ queue and worker
 prisma/
