@@ -1,6 +1,6 @@
 model RecipeJob {
     id          String   @id @default(uuid())
-    ingredients String[]
+    ingredients String
     goal        String
     status      String
     createdAt   DateTime @default(now())

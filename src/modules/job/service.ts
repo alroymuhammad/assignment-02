@@ -17,13 +17,10 @@ const RecipeListSchema = z.object({
 const SYSTEM_INSTRUCTIONS =
     "You are an Indonesian cooking expert. Generate up to 3 recipes as JSON.";
 
-export async function generateRecipeList(
-    ingredients: readonly string[],
-    goal: string,
-) {
-    console.log(`Generating recipes for: ${ingredients.join(", ")}`);
+export async function generateRecipeList(ingredients: string, goal: string) {
+    console.log(`Generating recipes for: ${ingredients}`);
 
-    const prompt = `Generate Indonesian recipes using these ingredients: ${ingredients.join(", ")}.
+    const prompt = `Generate Indonesian recipes using these ingredients: ${ingredients}.
 The recipes should satisfy this goal: ${goal}.`;
 
     const res = await generateCompletion({

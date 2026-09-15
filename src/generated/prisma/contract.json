@@ -41,7 +41,6 @@
                 }
               },
               "ingredients": {
-                "many": true,
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
@@ -172,13 +171,6 @@
         "entries": {
           "table": {
             "recipeJob": {
-              "checks": [
-                {
-                  "expression": "array_position(\"ingredients\", NULL) IS NULL",
-                  "name": "recipeJob_ingredients_elem_not_null_225187b9",
-                  "prefix": "recipeJob_ingredients_elem_not_null"
-                }
-              ],
               "columns": {
                 "createdAt": {
                   "codecId": "pg/timestamptz-temporal@1",
@@ -201,7 +193,6 @@
                 },
                 "ingredients": {
                   "codecId": "pg/text@1",
-                  "many": true,
                   "nativeType": "text",
                   "nullable": false
                 },
@@ -287,7 +278,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "409bc0dec4980f6daa6e6776b66d05ddfa23bda4cffabb079adf973f13b48c41"
+    "storageHash": "a33d2b4c365ffa4e5a185872afaff13a66511410a2244f87f9bc74f56c8d0640"
   },
   "execution": {
     "executionHash": "720d7c11e350d40f69ac3b5a8f9593ab8300290ba690d2c45c7b2fbb8b22503c",
