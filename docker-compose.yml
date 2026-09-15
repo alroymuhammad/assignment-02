@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: hono
       POSTGRES_DB: hono
     ports:
-      - "55432:5432"
+      - "15432:5432"
     volumes:
       - hono_prisma_db:/var/lib/postgresql/data
 
