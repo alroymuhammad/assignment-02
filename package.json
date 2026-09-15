@@ -2,8 +2,8 @@
   "name": "hono-prisma",
   "type": "module",
   "scripts": {
-    "dev": "exec node --harmony-temporal --watch --import tsx src/index.ts",
-    "worker:dev": "exec node --harmony-temporal --watch --import tsx src/worker/worker.ts",
+    "dev": "tsx src/index.ts",
+    "worker:dev": "tsx src/worker/worker.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "contract:emit": "prisma contract emit"
